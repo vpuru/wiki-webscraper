@@ -14,7 +14,7 @@ class RobotsChecker:
 
     async def load(self, robots_url: str) -> None:
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(headers={"User-Agent": self._user_agent}) as session:
                 async with session.get(robots_url) as resp:
                     if resp.status == 200:
                         text = await resp.text()

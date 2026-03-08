@@ -37,6 +37,11 @@ def main() -> None:
         help="DynamoDB table name",
     )
     parser.add_argument(
+        "--user-agent",
+        default=CrawlConfig.user_agent,
+        help="User-Agent header string",
+    )
+    parser.add_argument(
         "--log-level",
         default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
@@ -55,6 +60,7 @@ def main() -> None:
         max_concurrent_requests=args.concurrency,
         requests_per_second=args.rate,
         dynamo_table_name=args.table_name,
+        user_agent=args.user_agent,
     )
 
     orchestrator = CrawlOrchestrator(config)

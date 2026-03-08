@@ -17,7 +17,7 @@ class CrawlConfig:
     max_retries: int = 3
     dynamo_table_name: str = "WikiCrawlState"
     dynamo_batch_size: int = 25
-    user_agent: str = "WikiScraper/0.1 (educational project; +https://github.com/example)"
+    user_agent: str = "Mozilla/5.0 (compatible; WikiScraper/0.1; educational project; contact: wikiscraper@example.com)"
     worker_idle_timeout: float = 30.0
     max_links_per_page: int = 3000
     allowed_host: str = "en.wikipedia.org"
