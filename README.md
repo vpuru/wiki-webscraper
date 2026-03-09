@@ -94,3 +94,12 @@ wiki-scraper/
 **Crash recovery** — DynamoDB stores a `status` field per page. On restart, the orchestrator queries the `StatusIndex` GSI for `pending`/`in_progress` items and re-seeds the frontier.
 
 **DynamoDB PK is SHA-256(url)** — Uniform partition distribution, fixed size, avoids Unicode/length issues with raw URLs as keys.
+
+
+## Additional Thoughts
+I built this mainly to learn/refresh on a couple topics
+- parallelism / concurrency
+- bloom filters
+- token bucket implementations
+
+Figured it was worth publishing as a showcase.
