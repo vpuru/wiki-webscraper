@@ -20,10 +20,16 @@ def main() -> None:
         help="Maximum BFS depth",
     )
     parser.add_argument(
+        "--workers",
+        type=int,
+        default=CrawlConfig.num_workers,
+        help="Number of async worker coroutines",
+    )
+    parser.add_argument(
         "--concurrency",
         type=int,
         default=CrawlConfig.max_concurrent_requests,
-        help="Number of concurrent requests",
+        help="Max concurrent in-flight requests (semaphore)",
     )
     parser.add_argument(
         "--rate",
@@ -57,6 +63,7 @@ def main() -> None:
     config = CrawlConfig(
         seed_url=args.seed_url,
         max_depth=args.max_depth,
+        num_workers=args.workers,
         max_concurrent_requests=args.concurrency,
         requests_per_second=args.rate,
         dynamo_table_name=args.table_name,

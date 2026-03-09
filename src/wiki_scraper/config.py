@@ -5,9 +5,10 @@ from dataclasses import dataclass
 class CrawlConfig:
     seed_url: str = "https://en.wikipedia.org/wiki/Main_Page"
     max_depth: int = 100
-    max_concurrent_requests: int = 50
-    max_connections: int = 100
-    requests_per_second: float = 20.0
+    num_workers: int = 500
+    max_concurrent_requests: int = 200
+    max_connections: int = 2500
+    requests_per_second: float = 200.0
     bloom_expected_items: int = 8_000_000
     bloom_fp_rate: float = 0.001
     parser_workers: int = 4
@@ -17,7 +18,9 @@ class CrawlConfig:
     max_retries: int = 3
     dynamo_table_name: str = "WikiCrawlState"
     dynamo_batch_size: int = 25
-    user_agent: str = "Mozilla/5.0 (compatible; WikiScraper/0.1; educational project; contact: wikiscraper@example.com)"
+    user_agent: str = (
+        "Mozilla/5.0 (compatible; WikiScraper/0.1; educational project; contact: wikiscraper@example.com)"
+    )
     worker_idle_timeout: float = 30.0
     max_links_per_page: int = 3000
     allowed_host: str = "en.wikipedia.org"

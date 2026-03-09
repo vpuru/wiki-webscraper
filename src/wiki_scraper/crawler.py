@@ -48,7 +48,7 @@ class CrawlOrchestrator:
 
         workers = [
             asyncio.create_task(self._worker(i))
-            for i in range(self._config.max_concurrent_requests)
+            for i in range(self._config.num_workers)
         ]
 
         await asyncio.gather(*workers)
