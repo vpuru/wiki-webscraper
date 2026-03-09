@@ -1,5 +1,8 @@
-# wiki-scraper
+# WikiScraper
 
+<img width="811" height="233" alt="Screenshot 2026-03-08 at 5 23 22 PM" src="https://github.com/user-attachments/assets/9ea5eb31-e511-45db-9d7e-5162b308ce3d" />
+
+## Abstract
 High-throughput async web scraper for English Wikipedia. Crawls pages via BFS, extracts page titles and outgoing links, and persists everything to DynamoDB. Built to handle ~7.2M pages.
 
 ## Usage
