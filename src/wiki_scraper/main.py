@@ -1,12 +1,42 @@
 import argparse
 import asyncio
 import logging
+import time
+
+import pyfiglet
+from rich.console import Console
+from rich.text import Text
 
 from wiki_scraper.config import CrawlConfig
 from wiki_scraper.crawler import CrawlOrchestrator
 
+console = Console(stderr=True)
+
+GRADIENT = [
+    "#5f87ff", "#5f87ff", "#5fafff", "#5fd7ff", "#5fffff", "#87ffff",
+]
+
+
+def print_banner() -> None:
+    art = pyfiglet.figlet_format("WikiScraper", font="slant")
+    lines = art.rstrip("\n").split("\n")
+
+    for i, line in enumerate(lines):
+        color = GRADIENT[i % len(GRADIENT)]
+        text = Text(f"  {line}")
+        text.stylize(color)
+        console.print(text, highlight=False)
+        time.sleep(0.05)
+
+    console.print()
+    console.print("  [dim]async BFS crawler  |  bloom dedup  |  DynamoDB storage[/dim]")
+    console.print(f"  [dim]{'=' * 56}[/dim]")
+    console.print()
+
 
 def main() -> None:
+    print_banner()
+
     parser = argparse.ArgumentParser(description="Wikipedia link scraper")
     parser.add_argument(
         "--seed-url",

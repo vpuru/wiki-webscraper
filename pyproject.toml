@@ -12,6 +12,8 @@ dependencies = [
     "lxml>=5.0",
     "mmh3>=4.0",
     "bitarray>=2.8",
+    "pyfiglet>=1.0",
+    "rich>=13.0",
 ]
 
 [project.optional-dependencies]
