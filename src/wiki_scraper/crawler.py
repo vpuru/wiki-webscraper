@@ -18,7 +18,7 @@ class CrawlOrchestrator:
         self._config = config
         self._frontier = UrlFrontier(config.bloom_expected_items, config.bloom_fp_rate)
         self._fetcher = HttpFetcher(config)
-        self._parser = ContentParser(config.parser_workers, config.allowed_host)
+        self._parser = ContentParser(config.allowed_host)
         self._robots = RobotsChecker(config.user_agent)
         self._store = DynamoDbCrawlStore(config.dynamo_table_name, config.max_links_per_page)
         self._shutting_down = False
@@ -104,7 +104,7 @@ class CrawlOrchestrator:
             ))
             return
 
-        result = await self._parser.parse(html, url)
+        result = self._parser.parse(html, url)
 
         await self._store.put_page(PageRecord(
             url=url,
