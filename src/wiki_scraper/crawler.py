@@ -21,8 +21,8 @@ class CrawlOrchestrator:
         self._parser = ContentParser(config.allowed_host)
         self._robots = RobotsChecker(config.user_agent)
         self._store = DynamoDbCrawlStore(config.dynamo_table_name, config.max_links_per_page)
-        self._shutting_down = False
         self._pages_crawled = 0
+        self._workers: list[asyncio.Task] = []
 
     async def run(self) -> None:
         loop = asyncio.get_running_loop()
@@ -46,18 +46,18 @@ class CrawlOrchestrator:
 
         await self._fetcher.start()
 
-        workers = [
+        self._workers = [
             asyncio.create_task(self._worker(i))
             for i in range(self._config.num_workers)
         ]
 
-        await asyncio.gather(*workers)
+        await asyncio.gather(*self._workers, return_exceptions=True)
         await self._shutdown()
 
     def _request_shutdown(self) -> None:
-        if not self._shutting_down:
-            logger.info("Shutdown requested, finishing in-flight work...")
-            self._shutting_down = True
+        logger.info("Shutdown requested, cancelling workers...")
+        for task in self._workers:
+            task.cancel()
 
     async def _shutdown(self) -> None:
         logger.info("Flushing DynamoDB buffer...")
@@ -72,22 +72,25 @@ class CrawlOrchestrator:
         )
 
     async def _worker(self, worker_id: int) -> None:
-        while not self._shutting_down:
-            try:
-                item = await asyncio.wait_for(
-                    self._frontier.dequeue(),
-                    timeout=self._config.worker_idle_timeout,
-                )
-            except asyncio.TimeoutError:
-                logger.info("Worker %d idle for %.0fs, exiting", worker_id, self._config.worker_idle_timeout)
-                return
+        try:
+            while True:
+                try:
+                    item = await asyncio.wait_for(
+                        self._frontier.dequeue(),
+                        timeout=self._config.worker_idle_timeout,
+                    )
+                except asyncio.TimeoutError:
+                    logger.info("Worker %d idle for %.0fs, exiting", worker_id, self._config.worker_idle_timeout)
+                    return
 
-            try:
-                await self._process_url(item.url, item.depth)
-            except Exception:
-                logger.exception("Worker %d error processing %s", worker_id, item.url)
-            finally:
-                self._frontier.task_done()
+                try:
+                    await self._process_url(item.url, item.depth)
+                except Exception:
+                    logger.exception("Worker %d error processing %s", worker_id, item.url)
+                finally:
+                    self._frontier.task_done()
+        except asyncio.CancelledError:
+            return
 
     async def _process_url(self, url: str, depth: int) -> None:
         if not self._robots.is_allowed(url):
